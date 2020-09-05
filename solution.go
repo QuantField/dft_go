@@ -65,30 +65,26 @@ func (s *Solution) BoundaryValueResult(E float64) float64 {
 func (s *Solution) FindSolutionIntervals(Emin, Emax, dE float64) map[int]interval {
 
 	solIntervals := make(map[int]interval)
-	n := 0
+	n := 1
 	for val := Emin; val < Emax; val += dE {
 		if s.BoundaryValueResult(val)*s.BoundaryValueResult(val+dE) < 0 {
 			solIntervals[n] = interval{val, val + dE}
+			n++
 		}
 	}
 	return solIntervals
 }
 
-
-func (s *Solution) FindEigenState( Elow, EUpp float64) (float64, []float64) {
-    psi := make([]float64, len(s.Sol))
-	E, iter := brent(s.BoundaryValueResult , Elow , EUpp)  
-	if iter!=-1 {
+func (s *Solution) FindEigenState(Elow, EUpp float64) (float64, []float64) {
+	psi := make([]float64, len(s.Sol))
+	E, iter := brent(s.BoundaryValueResult, Elow, EUpp)
+	if iter != -1 {
 		copy(psi, s.Sol)
 		return E, psi
 	} else {
-		 return 0, nil
+		return 0, nil
 	}
 }
-
-
-
-
 
 func main() {
 
@@ -110,15 +106,12 @@ func main() {
 
 	fmt.Println("Solution: ")
 
-	//a:= sol.Sol
-	// fmt.Println(a[0:10])
-	// fmt.Println(a[len(a)-10:len(a)])
 	q := sol.FindSolutionIntervals(-10, 0, 1)
 	fmt.Println(q)
-	E, psi := sol.FindEigenState(-2, -1)		
+	E, psi := sol.FindEigenState(-1, 0)
 	if psi != nil {
 		fmt.Println("E = ", E)
 		fmt.Println("Psi = ", psi[0:5])
-		fmt.Println("Psi = ", psi[ len(psi)-5:])
+		fmt.Println("Psi = ", psi[len(psi)-5:])
 	}
 }
