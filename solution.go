@@ -102,8 +102,6 @@ func main() {
 
 	sol := NewSolution(radius, atom.Veff)
 
-	sol.Numerov(-0.5)
-
 	fmt.Println("Solution: ")
 
 	q := sol.FindSolutionIntervals(-10, 0, 1)

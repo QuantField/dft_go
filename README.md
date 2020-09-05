@@ -1,4 +1,4 @@
-## Numerov Method for Shordinger Equation with Radial Potential 
+## Numerov Method for Shrodinger Equation with Radial Potential 
 * Testing solution.go
 ```
 
@@ -17,9 +17,7 @@ func main() {
 	atom.SetVeff(nil)
 
 	sol := NewSolution(radius, atom.Veff)
-
-	sol.Numerov(-0.5)
-
+	
 	fmt.Println("Solution: ")
 
 	q := sol.FindSolutionIntervals(-10, 0, 1)
