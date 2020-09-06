@@ -50,11 +50,11 @@ type ExchangeCorrelation struct {
 
 func NewExchangeCorrelation(typ int) *ExchangeCorrelation {
 	res := []ExchangeCorrelation{
-		{C: 0.0504, A: 30, etype: typ},
-		{C: 0.0666, A: 11.4, etype: typ},
-		{C: 0.045, A: 21, etype: typ},
-		{C: 0, A: 0, etype: typ},
-		{C: 0, A: 0, etype: typ},
+		{0.0504, 30, typ},
+		{0.0666, 11.4, typ},
+		{0.045, 21, typ},
+		{0, 0, typ},
+		{0, 0, typ},
 	}
 	if typ > len(res)-1 {
 		log.Printf(":[Error] etype should be in [0,4] found " + strconv.Itoa(typ))
@@ -85,12 +85,15 @@ func (e *ExchangeCorrelation) Vc(rs float64) float64 {
 		x := math.Sqrt(rs)
 		xpx := x*x + bp*x + cp
 		atnp := math.Atan2(Qp, (2*x + bp))
-		ecp := 0.5 * Ap * (math.Log(x*x/xpx) + cp1*atnp - cp3*(math.Log((x-xp0)*(x-xp0)/xpx)+cp2*atnp))
+		ecp := 0.5 * Ap * (math.Log(x*x/xpx) +
+			cp1*atnp -
+			cp3*(math.Log((x-xp0)*(x-xp0)/xpx)+cp2*atnp))
 		return ecp - Ap/6.*(cp*(x-xp0)-bp*x*xp0)/((x-xp0)*xpx)
 	} else {
 		if rs > 1 {
-			return gamma / (1 + beta1*math.Sqrt(rs) + beta2*rs) * (1 + 7/6.*beta1*math.Sqrt(rs) +
-				beta2*rs) / (1 + beta1*math.Sqrt(rs) + beta2*rs)
+			return gamma / (1 + beta1*math.Sqrt(rs) + beta2*rs) *
+				(1 + 7/6.*beta1*math.Sqrt(rs) + beta2*rs) /
+				(1 + beta1*math.Sqrt(rs) + beta2*rs)
 		} else {
 			return Aw*math.Log(rs) + Bw - Aw/3. + 2/3.*Cw*rs*math.Log(rs) + (2*D-Cw)*rs/3.
 		}
@@ -116,6 +119,7 @@ func (e *ExchangeCorrelation) EcVc(rs float64) float64 {
 	}
 }
 
+/*
 func main() {
 
 	for _, i := range []int{0, 1, 2, 3, 4, 5} {
@@ -126,3 +130,4 @@ func main() {
 		}
 	}
 }
+*/
