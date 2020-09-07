@@ -101,29 +101,26 @@ func integrate(y []float64, h float64) float64 {
 	return h * S / 3
 }
 
-
 func normalize(y []float64, h float64) []float64 {
 	N := len(y) - 1
-	yNorm:= make([]float64, len(y))
+	yNorm := make([]float64, len(y))
 	if N%2 != 0 {
 		log.Panic("method integrate error: length of array  must be odd.")
 	}
 	S := y[0]*y[0] + y[N]*y[N]
 	for i := 1; i <= N; i = i + 2 {
-		S += 4 * y[i]*y[i]
+		S += 4 * y[i] * y[i]
 	}
 	for i := 2; i <= N-1; i = i + 2 {
-		S += 2 * y[i]*y[i]
+		S += 2 * y[i] * y[i]
 	}
 	A := h * S / 3
+	A = math.Sqrt(A)
 	for i := 0; i <= N; i++ {
-		yNorm[i]=y[i]/A
-	}	
+		yNorm[i] = y[i] / A
+	}
 	return yNorm
 }
-
-
-
 
 /* func main() {
 
@@ -138,10 +135,10 @@ func normalize(y []float64, h float64) []float64 {
 
 	// testing simpson integration
 
-	
+
 	y := []float64{0, 1, 4, 9, 16}
 	fmt.Println()
 	fmt.Println(integrate(y, 1)) // 4^3/3
 
 }
- */
+*/

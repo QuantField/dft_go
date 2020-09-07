@@ -178,9 +178,11 @@ func main() {
 		fmt.Println("Psi = ", psi[len(psi)-2:])
 
 		u := NewEigenEigenState(E, 1 ,0, psi, sol.h)
-		u.normalize()
+		
 		SaveData(sol.r, u.value, "psi.dat")
+		SaveData(sol.r, u.ProbabilityDensity(), "dens.dat")
 		SaveData(sol.r, sol.V, "pot.dat")
+		fmt.Println(integrate(u.ProbabilityDensity(), sol.h ) )
 	}
 
 }
