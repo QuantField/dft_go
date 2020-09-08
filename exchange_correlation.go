@@ -18,7 +18,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"math"
 	"strconv"
@@ -43,11 +42,13 @@ const (
 	cp3    = -0.031167608
 )
 
+// ExchangeCorrelation 
 type ExchangeCorrelation struct {
 	C, A  float64
 	etype int
 }
 
+// NewExchangeCorrelation
 func NewExchangeCorrelation(typ int) *ExchangeCorrelation {
 	res := []ExchangeCorrelation{
 		{0.0504, 30, typ},
@@ -64,18 +65,22 @@ func NewExchangeCorrelation(typ int) *ExchangeCorrelation {
 	}
 }
 
+// Vx
 func (e *ExchangeCorrelation) Vx(rs float64) float64 {
 	return -alphax / rs
 }
 
+// ExVx
 func (e *ExchangeCorrelation) ExVx(rs float64) float64 {
 	return 0.25 * alphax / rs
 }
 
+// Ex
 func (e *ExchangeCorrelation) Ex(rs float64) float64 {
 	return -0.75 * alphax / rs
 }
 
+// Vc
 func (e *ExchangeCorrelation) Vc(rs float64) float64 {
 
 	if e.etype < 3 {
@@ -100,6 +105,7 @@ func (e *ExchangeCorrelation) Vc(rs float64) float64 {
 	}
 }
 
+// EcVc
 func (e *ExchangeCorrelation) EcVc(rs float64) float64 {
 	if e.etype < 3 {
 		x := rs / e.A

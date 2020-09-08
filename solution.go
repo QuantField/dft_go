@@ -120,7 +120,7 @@ func (s *Solution) FindSolutionIntervals(Emin, Emax, dE float64) map[int]interva
 
 func (s *Solution) FindEigenState(Elow, Eupp float64) (float64, []float64) {
 	psi := make([]float64, len(s.Sol))
-	E, iter := brent(s.BoundaryValueResult, Elow, Eupp)
+	E, iter := Brent(s.BoundaryValueResult, Elow, Eupp)
 	if iter != -1 {
 		copy(psi, s.Sol)
 		return E, psi
@@ -149,40 +149,4 @@ func SaveData(x, y []float64, filename string) {
 	if err != nil {
 		fmt.Println("error")
 	}
-}
-
-func main() {
-
-	// defining the ratius with max length of 10 units
-	// grid of N+1 points
-	Rmax := 10.0
-	N := 1000
-	radius := NewRadius(Rmax, N)
-
-	// Atom Z = 1
-	atom := NewAtom(1, radius)
-	atom.SetVcoulomb()
-	atom.SetVcentrifugal(0) // l=0
-	atom.SetVeff(nil)
-
-	sol := NewSolution(radius, atom.Veff)
-
-	fmt.Println("Solution: ")
-
-	q := sol.FindSolutionIntervals(-10, 0, 1)
-	fmt.Println(q)
-	E, psi := sol.FindEigenState(-1, 0)
-	if psi != nil {
-		fmt.Println("E = ", E)
-		fmt.Println("Psi = ", psi[0:2])
-		fmt.Println("Psi = ", psi[len(psi)-2:])
-
-		u := NewEigenEigenState(E, 1 ,0, psi, sol.h)
-		
-		SaveData(sol.r, u.value, "psi.dat")
-		SaveData(sol.r, u.ProbabilityDensity(), "dens.dat")
-		SaveData(sol.r, sol.V, "pot.dat")
-		fmt.Println(integrate(u.ProbabilityDensity(), sol.h ) )
-	}
-
 }
