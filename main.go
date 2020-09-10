@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	 atom "quantum/atom"
+	 solEng  "quantum/sol"
+)
 
 func main() {
 
@@ -8,15 +12,15 @@ func main() {
 	// grid of N+1 points
 	Rmax := 10.0
 	N := 4000
-	radius := NewRadius(Rmax, N)
+	radius := atom.NewRadius(Rmax, N)
 
 	// Atom Z = 1
-	atom := NewAtom(1, radius)
-	atom.SetVcoulomb()
-	atom.SetVcentrifugal(0) // l=0
-	atom.SetVeff(nil)
+	H := atom.NewAtom(1, radius)
+	H.SetVcoulomb()
+	H.SetVcentrifugal(0) // l=0
+	H.SetVeff(nil)
 
-	sol := NewSolution(radius, atom.Veff)
+	sol := solEng.NewSolution(radius, H.Veff)
 
 	fmt.Println("Solution: ")
 
@@ -28,12 +32,12 @@ func main() {
 		fmt.Println("Psi = ", psi[0:2])
 		fmt.Println("Psi = ", psi[len(psi)-2:])
 
-		u := NewEigenEigenState(E, 1 ,0, psi, sol.h)
+		u := solEng.NewEigenEigenState(E, 1 ,0, psi,  sol.GridStep)
 		
-		SaveData(sol.r, u.value, "misc/psi.dat")
-		SaveData(sol.r, u.ProbabilityDensity(), "misc/dens.dat")
-		SaveData(sol.r, sol.V, "misc/pot.dat")
-		fmt.Println(Integrate(u.ProbabilityDensity(), sol.h ) )
+		solEng.SaveData(sol.R, u.Value, "misc/psi.dat")
+		solEng.SaveData(sol.R, u.ProbabilityDensity(), "misc/dens.dat")
+		solEng.SaveData(sol.R, sol.V, "misc/pot.dat")
+		fmt.Println(solEng.Integrate(u.ProbabilityDensity(), sol.GridStep ) )
 	}
 
 }
