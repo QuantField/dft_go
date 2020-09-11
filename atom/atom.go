@@ -14,7 +14,7 @@ const INFINITY = 0.0
 type Radius struct {
 	Rmax  float64
 	N     int
-	h     float64
+	GridStep   float64
 	Array []float64
 }
 
@@ -30,16 +30,12 @@ func NewRadius(Rmax float64, N int) *Radius {
 	r := Radius{
 		Rmax:  Rmax,
 		N:     N,
-		h:     dr,
+		GridStep:     dr,
 		Array: rad,
 	}
 	return &r
 }
 
-// GridStep returns radius discretization step h
-func (r *Radius) GridStep() float64 {
-	return r.h
-}
 
 //============================= Atom =============================
 

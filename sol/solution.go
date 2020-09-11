@@ -56,7 +56,7 @@ type Solution struct {
 func NewSolution(radius *atom.Radius, V []float64) *Solution {
 	N := len(radius.Array)
 	s := Solution{
-		GridStep:                      radius.GridStep(),
+		GridStep:               radius.GridStep,
 		R:                      radius.Array,
 		V:                      V,
 		K:                      make([]float64, N),
