@@ -24,8 +24,14 @@ func main() {
 
 	fmt.Println("Solution: ")
 
-	q := sol.FindSolutionIntervals(-10, 0, 1)
-	fmt.Println(q)
+	q := sol.FindSolutionIntervals(-10, -0.0001, .01)
+	
+	for key, interval:=range q {
+		E, _ := sol.FindEigenState(interval.Lower,  interval.Upper)
+		fmt.Println("n = ", key, " Solution interval", interval, "E =", E)
+	} 
+	//fmt.Println(q)
+	/* 
 	E, psi := sol.FindEigenState(-1, 0)
 	if psi != nil {
 		fmt.Println("E = ", E)
@@ -38,6 +44,7 @@ func main() {
 		solEng.SaveData(sol.R, u.ProbabilityDensity(), "misc/dens.dat")
 		solEng.SaveData(sol.R, sol.V, "misc/pot.dat")
 		fmt.Println(solEng.Integrate(u.ProbabilityDensity(), sol.GridStep ) )
-	}
+	 }
+	 */
 
 }

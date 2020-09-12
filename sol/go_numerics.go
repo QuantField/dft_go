@@ -122,6 +122,8 @@ func Normalize(y []float64, h float64) []float64 {
 	return yNorm
 }
 
+
+
 /* func main() {
 
 	cubic := func(x float64) float64 {

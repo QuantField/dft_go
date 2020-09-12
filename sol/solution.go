@@ -34,8 +34,8 @@ import (
 )
 
 type interval struct {
-	lower float64
-	upper float64
+	Lower float64
+	Upper float64
 }
 
 // Solution contains the necessary data to use Numerov algorithm
@@ -65,8 +65,6 @@ func NewSolution(radius *atom.Radius, V []float64) *Solution {
 	}
 	return &s
 }
-
-
 
 // SetInitialValues first two initial boundary conditions
 // if E==0, s0 and s1 are used
