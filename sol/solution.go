@@ -23,72 +23,68 @@ In a more practical form for calculation
 
 ------------------------------------------------------------------------------*/
 
-package main
+package sol
 
 import (
 	"encoding/csv"
 	"fmt"
 	"math"
 	"os"
+	atom "quantum/atom" 
 )
 
 type interval struct {
-	lower float64
-	upper float64
+	Lower float64
+	Upper float64
 }
 
+// Solution contains the necessary data to use Numerov algorithm
 type Solution struct {
-	h                      float64
-	r                      []float64
+	GridStep               float64  // h = dr
+	R                      []float64
 	V                      []float64
 	E                      float64
 	K                      []float64
 	Sol                    []float64
-	boundary_element_index int // either r[0] or r[len(r)-1]
+	boundaryElementIndex int // either r[0] or r[len(r)-1]
 }
 
+// NewSolution create a Solution object
 // Numerov is iterated backward. The goad is to tune E in order to make
-// the solution =0 at r=0, i.e. u(r[boundary_element_index])=0
-// where boundary_element_index =0
-func NewSolution(radius *Radius, V []float64) *Solution {
-	N := len(radius.array)
+// the solution =0 at r=0, i.e. u(r[boundaryElementIndex])=0
+// where boundaryElementIndex =0
+func NewSolution(radius *atom.Radius, V []float64) *Solution {
+	N := len(radius.Array)
 	s := Solution{
-		h:                      radius.h,
-		r:                      radius.array,
+		GridStep:               radius.GridStep,
+		R:                      radius.Array,
 		V:                      V,
 		K:                      make([]float64, N),
 		Sol:                    make([]float64, N),
-		boundary_element_index: 0,
+		boundaryElementIndex: 0,
 	}
 	return &s
 }
 
-// if E==0, s0 and s1 are used
-// if not they are calculated based on some logic
-func (s *Solution) SetInitialValues(E, s0, s1 float64) (float64, float64) {
-	N := len(s.r)
-	sol0, sol1 := s0*s.r[N-1], s1*s.r[N-2]
-	if E != 0 || s0*s1 == 0 {
-		alph := math.Sqrt(-2 * E)
-		sol0 = s.r[N-1] * math.Exp(-alph*s.r[N-1])
-		sol1 = s.r[N-2] * math.Exp(-alph*s.r[N-2])
-	}
-	return sol0, sol1
-}
 
+// Numerov  Method for solving y'' = A*y
 // if we start iterating fomr r[0] to r[n] ( n index of last element)
 // then sol0 = Sol(r[0]), sol1 = Sol(r[1])
 // if we start iterating from r[n] down to r[0] then
 // sol0 = r[n], sol1 = r[n-1]
-func (s *Solution) Numerov(E, sol0, sol1 float64) {
-
-	N := len(s.r)
-	C := s.h * s.h / 12
+func (s *Solution) Numerov(E float64) {
+	
+	h := s.GridStep
+	N := len(s.R)
+	C := h*h / 12
 
 	for i := 1; i < N; i++ {
 		s.K[i] = 2 * (E - s.V[i]) // in Hartree  or E0-2*V[i] for Ryleigs;
-	}
-
+	}	
+	
+	alph := math.Sqrt(-2 * E)
+	sol0 := s.R[N-1] * math.Exp(-alph*s.R[N-1])
+	sol1 := s.R[N-2] * math.Exp(-alph*s.R[N-2])
 	s.Sol[N-1], s.Sol[N-2] = sol0, sol1
 	for i := N - 2; i >= 1; i-- {
 		s.Sol[i-1] = (2*(1.-5.*C*s.K[i])*s.Sol[i] -
@@ -96,14 +92,15 @@ func (s *Solution) Numerov(E, sol0, sol1 float64) {
 	}
 }
 
-func (s *Solution) BoundaryValueResult(E float64) float64 {	
-	sol0, sol1 := s.SetInitialValues(E, 0, 0)
-	//sol0, sol1 := s.SetInitialValues(0, 7e-06, 7.5e-06) // not working
-	// fmt.Println("E:", E , "sol0: ", sol0, " ", "sol1: ", sol1)
-	s.Numerov(E, sol0, sol1)
-	return s.Sol[s.boundary_element_index]
+// BoundaryValueResult Returns the last computed value
+// This value  should be =0 at r = 0
+func (s *Solution) BoundaryValueResult(E float64) float64 {		
+	s.Numerov(E)
+	return s.Sol[s.boundaryElementIndex]
 }
 
+// FindSolutionIntervals checks for solutions between Emin an Emax 
+// search is done by steps of length dE
 func (s *Solution) FindSolutionIntervals(Emin, Emax, dE float64) map[int]interval {
 
 	solIntervals := make(map[int]interval)
@@ -118,17 +115,20 @@ func (s *Solution) FindSolutionIntervals(Emin, Emax, dE float64) map[int]interva
 	return solIntervals
 }
 
+// FindEigenState given an interval [Elow, Eupp] that contains a solution 
+// (f(E)=0) this function finds the exact value of E
 func (s *Solution) FindEigenState(Elow, Eupp float64) (float64, []float64) {
 	psi := make([]float64, len(s.Sol))
 	E, iter := Brent(s.BoundaryValueResult, Elow, Eupp)
 	if iter != -1 {
 		copy(psi, s.Sol)
 		return E, psi
-	} else {
-		return 0, nil
-	}
+	} 
+	return 0, nil
+	
 }
 
+// SaveData save on the form r, f(r)
 func SaveData(x, y []float64, filename string) {
 	//S := make([][]string, len(x), len(x)+10)
 	var S [][]string

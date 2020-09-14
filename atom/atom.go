@@ -1,4 +1,4 @@
-package main
+package atom
 
 //import "fmt"
 
@@ -14,8 +14,8 @@ const INFINITY = 0.0
 type Radius struct {
 	Rmax  float64
 	N     int
-	h     float64
-	array []float64
+	GridStep   float64
+	Array []float64
 }
 
 // NewRadius Radius constructor
@@ -30,11 +30,12 @@ func NewRadius(Rmax float64, N int) *Radius {
 	r := Radius{
 		Rmax:  Rmax,
 		N:     N,
-		h:     dr,
-		array: rad,
+		GridStep:     dr,
+		Array: rad,
 	}
 	return &r
 }
+
 
 //============================= Atom =============================
 
@@ -53,7 +54,7 @@ type Atom struct {
 func NewAtom(Z float64, radius *Radius) *Atom {
 	// r0 := make([]float64, len(r))
 	// copy(r0, r) //deep copy
-	r := radius.array
+	r := radius.Array
 	a := Atom{
 		Z: Z,
 		r: r,
@@ -103,7 +104,7 @@ func main() {
 	Rmax:= 10.0
 	N := 100
 
-	atom:= NewAtom(1, NewRadius(Rmax, N).array)
+	atom:= NewAtom(1, NewRadius(Rmax, N).Array)
 	//fmt.Println(atom.r)
 	print_arr(atom.r)
 	print_arr(nil)

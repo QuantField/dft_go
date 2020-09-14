@@ -15,7 +15,7 @@
 //  type=4 - Correlation of Perdew and Wang 1991                               */
 //******************************************************************************/
 
-package main
+package atom
 
 import (
 	"log"

@@ -1,4 +1,4 @@
-package main
+package sol
 
 import (
 	"fmt"
@@ -121,6 +121,8 @@ func Normalize(y []float64, h float64) []float64 {
 	}
 	return yNorm
 }
+
+
 
 /* func main() {
 
