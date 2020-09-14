@@ -66,34 +66,25 @@ func NewSolution(radius *atom.Radius, V []float64) *Solution {
 	return &s
 }
 
-// SetInitialValues first two initial boundary conditions
-// if E==0, s0 and s1 are used
-// if not they are calculated based on some logic
-func (s *Solution) SetInitialValues(E, s0, s1 float64) (float64, float64) {
-	N := len(s.R)
-	sol0, sol1 := s0*s.R[N-1], s1*s.R[N-2]
-	if E != 0 || s0*s1 == 0 {
-		alph := math.Sqrt(-2 * E)
-		sol0 = s.R[N-1] * math.Exp(-alph*s.R[N-1])
-		sol1 = s.R[N-2] * math.Exp(-alph*s.R[N-2])
-	}
-	return sol0, sol1
-}
 
 // Numerov  Method for solving y'' = A*y
 // if we start iterating fomr r[0] to r[n] ( n index of last element)
 // then sol0 = Sol(r[0]), sol1 = Sol(r[1])
 // if we start iterating from r[n] down to r[0] then
 // sol0 = r[n], sol1 = r[n-1]
-func (s *Solution) Numerov(E, sol0, sol1 float64) {
-    h := s.GridStep
+func (s *Solution) Numerov(E float64) {
+	
+	h := s.GridStep
 	N := len(s.R)
 	C := h*h / 12
 
 	for i := 1; i < N; i++ {
 		s.K[i] = 2 * (E - s.V[i]) // in Hartree  or E0-2*V[i] for Ryleigs;
-	}
-
+	}	
+	
+	alph := math.Sqrt(-2 * E)
+	sol0 := s.R[N-1] * math.Exp(-alph*s.R[N-1])
+	sol1 := s.R[N-2] * math.Exp(-alph*s.R[N-2])
 	s.Sol[N-1], s.Sol[N-2] = sol0, sol1
 	for i := N - 2; i >= 1; i-- {
 		s.Sol[i-1] = (2*(1.-5.*C*s.K[i])*s.Sol[i] -
@@ -103,11 +94,8 @@ func (s *Solution) Numerov(E, sol0, sol1 float64) {
 
 // BoundaryValueResult Returns the last computed value
 // This value  should be =0 at r = 0
-func (s *Solution) BoundaryValueResult(E float64) float64 {	
-	sol0, sol1 := s.SetInitialValues(E, 0, 0)
-	//sol0, sol1 := s.SetInitialValues(0, 7e-06, 7.5e-06) // not working
-	// fmt.Println("E:", E , "sol0: ", sol0, " ", "sol1: ", sol1)
-	s.Numerov(E, sol0, sol1)
+func (s *Solution) BoundaryValueResult(E float64) float64 {		
+	s.Numerov(E)
 	return s.Sol[s.boundaryElementIndex]
 }
 
