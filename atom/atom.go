@@ -16,7 +16,7 @@ import (
 type Atom struct {
 	Z            float64	
 	Vcoulomb     []float64
-	Vcentrifugal []float64
+	//Vcentrifugal []float64
 	// Total Potential, Veff = Veff0 + Vcentrifugal
 	Veff0 []float64 // Veff0 place holer for varying  Vks
 	Veff  []float64
@@ -34,7 +34,7 @@ func NewAtom(Z float64, grid *sol.LogGrid) *Atom {
 	}
 	n := len(grid.Val)
 	a.Vcoulomb = make([]float64, n)
-	a.Vcentrifugal = make([]float64, n)
+	//a.Vcentrifugal = make([]float64, n)
 	a.Veff0 = make([]float64, n)
 	a.Veff = make([]float64, n)
 	return &a
@@ -50,6 +50,7 @@ func (a *Atom) SetVcoulomb() {
 }
 
 // SetVcentrifugal Sets the centrifugal  Potential 0.5l(l+1)/r^2
+/* Won't be used as it is included in Soltion Initial Values
 func (a *Atom) SetVcentrifugal(j int) {
 	l := float64(j)
 	r2 := a.grid.ValSqr
@@ -58,20 +59,29 @@ func (a *Atom) SetVcentrifugal(j int) {
 	}
 	a.Vcentrifugal[0] = 0 //INFINITY
 }
+*/
+
+// SetVcentrifugal Constant in this case
+func (a *Atom) SetVcentrifugal(j int) float64{
+	l := float64(j)
+	return (l+0.5)*(l+0.5)
+}
+
 
 // SetVeff Sets effective potential Veff = Veff0 + 0.5l(l+1)/r^2
 // if Veff0 is nil then Veff0 becomes the Coulomb potential 
 // already calculated and stored in Vcoulom. 
 func (a *Atom) SetVeff(Veff0 []float64) {
 	var V []float64
-	V = Veff0
-	r := a.grid.Val
+	V = Veff0	
 	if Veff0 == nil {
 		V = a.Vcoulomb
 	}
-	for i := 0; i < len(r); i++ {
-		a.Veff[i] = V[i] + a.Vcentrifugal[i]
-	}
+	a.Veff = V 
+
+	// for i := 0; i < len(r); i++ {
+	// 	a.Veff[i] = V[i] + a.Vcentrifugal[i]
+	// }
 }
 
 

@@ -2,44 +2,71 @@ package main
 
 import (
 	"fmt"
-	"math"
 	atom "quantum/atom"
-	sol "quantum/sol"
+	lab "quantum/sol"
 )
-
-
 
 
 func main() {
 
-	N := 1000
+	N := 200
 	// 10^-5..10^1
-	grid := sol.NewLogGrid(-5,1, N)
+	grid := lab.NewLogGrid(-5, 1.2, N)
 	// fmt.Println(grid.Val)
 	// fmt.Println(grid.LogVal)
 	// fmt.Println(grid.ValSqr )
 	// fmt.Println(grid.ValSqrRoot)
 
-
-	
-	
-
 	// Atom Z = 1
 	H := atom.NewAtom(1, grid)
-	H.SetVcoulomb()
-	H.SetVcentrifugal(0) // l=0
+	H.SetVcoulomb()	
 	H.SetVeff(nil)
+	// i:=10
+	// fmt.Println(H.Vcoulomb[i], H.Veff[i], grid.Val[i])
+   
 
-	sol := sol.NewSolution(radius, H.Veff)
+	sols := lab.NewSolution(grid, H.Veff)
+	sols.Vcent = H.SetVcentrifugal(0)
+	
+	
+	
+	E := -0.5 // -0.5, -0.25
+	//TODO  the graph looks fine, but cant find E via searching with Brent method
+	sols.Numerov(E)
+	u:= sols.GetOrigSol()
+	u1:= lab.Normalize2(grid.Val, u)
+	u1 = lab.Square(u1)
+    SaveData(sols.Grid.Val, u1, "misc/psi_1.dat")
 
-	fmt.Println("Solution: ")
 
-	q := sol.FindSolutionIntervals(-10, -0.0001, .01)
+	E = -1.0/4.0 // -0.5, -0.25	
+	sols.Numerov(E)
+	u= sols.GetOrigSol()
+	u1= lab.Normalize2(grid.Val, u)
+	u1 = lab.Square(u1)
+	SaveData(sols.Grid.Val, u1, "misc/psi_2.dat")
+	
+	E = -1.0/9.0 // -0.5, -0.25	
+	sols.Numerov(E)
+	u= sols.GetOrigSol()
+	u1= lab.Normalize2(grid.Val, u)
+	u1 = lab.Square(u1)
+    SaveData(sols.Grid.Val, u1, "misc/psi_3.dat")
 
-	for key, interval := range q {
-		E, _ := sol.FindEigenState(interval.Lower, interval.Upper)
-		fmt.Println("n = ", key, " Solution interval", interval, "E =", E)
-	}
+
+
+
+
+
+
+	// fmt.Println("Solution: ")
+
+	// q := sol.FindSolutionIntervals(-0.6, -0.4, 0.01)
+
+	// for key, interval := range q {
+	// 	E, _ := sol.FindEigenState(interval.Lower, interval.Upper)
+	// 	fmt.Println("n = ", key, " Solution interval", interval, "E =", E)
+	// }
 	//fmt.Println(q)
 	/*
 		E, psi := sol.FindEigenState(-1, 0)
@@ -56,5 +83,6 @@ func main() {
 			fmt.Println(solEng.Integrate(u.ProbabilityDensity(), sol.GridStep ) )
 		 }
 	*/
- 
+	fmt.Println("end")
+
 }

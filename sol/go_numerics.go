@@ -122,6 +122,41 @@ func Normalize(y []float64, h float64) []float64 {
 	return yNorm
 }
 
+// IntegrateTrap Trapezoid integration method for unequally distant data 
+func IntegrateTrap(x, y []float64) float64 {	
+    S := 0.0
+    for i:=0; i<len(x)-1; i++ {  
+		S += (y[i]+y[i+1])*(x[i+1]-x[i]) 
+	}
+    return S/2
+}
+
+
+
+// Normalize2 : integ psi*psi = 1, using unequal spacing
+func Normalize2(x, y []float64) []float64 {
+	N := len(y) - 1
+	yNorm := make([]float64, len(y))
+	
+	for i := 0; i < N; i++ {
+		yNorm[i] = y[i]*y[i]	}
+ 
+	A:= IntegrateTrap(x, yNorm )  
+	A = math.Sqrt(A)
+	for i := 0; i < N; i++ {
+		yNorm[i] = y[i]/A
+	}
+	return yNorm
+}
+
+
+func Square(y []float64) []float64 {
+	y2 := make([]float64, len(y))
+	for i:=0; i<len(y); i++ {
+		y2[i]=y[i]*y[i]
+	}
+    return y2 
+}
 
 
 /* func main() {
